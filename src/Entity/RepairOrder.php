@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -11,30 +13,48 @@ class RepairOrder
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    public $id;
+    public ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    public $reference;
+    public string $reference;
 
-    // Statuts possibles : PENDING, IN_PROGRESS, WAITING_PARTS, DONE, DELIVERED, CANCELLED
-    #[ORM\Column(length: 50)]
-    public $status = 'PENDING';
+    #[ORM\Column(length: 50, enumType: RepairOrderStatus::class)]
+    public RepairOrderStatus $status = RepairOrderStatus::PENDING;
 
     #[ORM\ManyToOne(targetEntity: Customer::class)]
     #[ORM\JoinColumn(nullable: true)]
-    public $customer;
-
-    #[ORM\Column(type: 'float')]
-    public $totalAmount = 0;
-
-    #[ORM\Column(type: 'datetime')]
-    public $createdAt;
+    public ?Customer $customer = null;
 
     #[ORM\Column(length: 1000, nullable: true)]
-    public $description;
+    public ?string $description = null;
+
+    #[ORM\Column(type: 'datetime')]
+    public \DateTime $createdAt;
+
+    #[ORM\OneToOne(mappedBy: 'repairOrder', targetEntity: Quote::class, cascade: ['persist', 'remove'])]
+    public ?Quote $quote = null;
 
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    public function transitionTo(RepairOrderStatus $next): void
+    {
+        if (!$this->status->canTransitionTo($next)) {
+            throw new \DomainException(sprintf(
+                'Transition impossible : %s → %s',
+                $this->status->value,
+                $next->value
+            ));
+        }
+
+        $this->status = $next;
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->status === RepairOrderStatus::DELIVERED
+            || $this->status === RepairOrderStatus::CANCELLED;
     }
 }

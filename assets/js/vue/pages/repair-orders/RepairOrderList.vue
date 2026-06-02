@@ -40,7 +40,7 @@
             <th>Référence</th>
             <th>Client</th>
             <th>Statut</th>
-            <th>Montant</th>
+            <th>Devis TTC</th>
             <th>Date</th>
             <th></th>
           </tr>
@@ -52,7 +52,7 @@
             <td>
               <span :class="'status-badge status-' + order.status">{{ statusLabel(order.status) }}</span>
             </td>
-            <td>{{ order.totalAmount.toFixed(2) }} €</td>
+            <td>{{ order.quoteTotalTtc !== null ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(order.quoteTotalTtc) : '—' }}</td>
             <td>{{ order.createdAt }}</td>
             <td class="text-end" @click.stop>
               <button
@@ -104,9 +104,9 @@ interface RepairOrder {
   id: number
   reference: string
   status: string
-  totalAmount: number
   createdAt: string
   description: string | null
+  quoteTotalTtc: number | null
   customer: Customer | null
 }
 

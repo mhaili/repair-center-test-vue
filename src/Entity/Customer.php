@@ -11,14 +11,14 @@ class Customer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    public $id;
+    public ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    public $name;
+    public string $name;
 
     #[ORM\Column(length: 255, nullable: true)]
-    public $email;
+    public ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    public $phone;
+    public ?string $phone = null;
 }

@@ -11,14 +11,14 @@ class Part
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    public $id;
+    public ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    public $reference;
+    public string $reference;
 
     #[ORM\Column(length: 255)]
-    public $label;
+    public string $label;
 
     #[ORM\Column(type: 'float')]
-    public $salePrice;
+    public float $salePrice;
 }
